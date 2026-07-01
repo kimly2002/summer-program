@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6th Grade Infinite Custom Challenge</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --success: #2ec4b6;
+            --danger: #e71d36;
+            --dark: #2b2d42;
+            --light: #f8f9fa;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f7;
+            color: var(--dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .app-container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+        }
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+        h1 { margin: 0; color: var(--primary); font-size: 24px; }
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: var(--light);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+        .hidden { display: none !important; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+        }
+        button {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover { background: #357abd; }
+        .question-card {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid var(--primary);
+        }
+        .subject-badge {
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .options-route {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .option-btn {
+            background: white;
+            color: var(--dark);
+            border: 2px solid #e2e8f0;
+            text-align: left;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+        }
+        .option-btn:hover { background: #edf2f7; }
+        .option-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .option-btn.wrong { background: var(--danger) !important; color: white; border-color: var(--danger); }
+        
+        .explanation-box {
+            margin-top: 15px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            background-color: #fff;
+            border: 1px solid #d3e2f2;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .completion-screen { text-align: center; padding: 40px 20px; }
+        .streak-fire { font-size: 48px; margin-bottom: 10px; }
+        
+        .score-box {
+            background-color: var(--light);
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        .score-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-top: 5px;
+        }
+        .badge-text {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        .decision-box { display: flex; gap: 15px; margin-top: 25px; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #5a6268; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- SIGN IN SCREEN -->
+    <div id="auth-screen">
+        <header>
+            <h1>Welcome to Middle School Practice</h1>
+        </header>
+        <div class="form-group">
+            <label for="username">Enter your name to sign in:</label>
+            <input type="text" id="username" placeholder="e.g., Alex">
+        </div>
+        <button onclick="signIn()">Sign In</button>
+    </div>
+
+    <!-- SETUP SELECTION DASHBOARD SCREEN -->
+    <div id="setup-screen" class="hidden">
+        <header>
+            <h1>Configure Your Practice Session</h1>
+        </header>
+        <div class="form-group">
+            <label for="subject-choice">Choose a Subject:</label>
+            <select id="subject-choice">
+                <option value="mixed">All Subjects Mixed</option>
+                <option value="math">Mathematics Only</option>
+                <option value="ela">English Language Arts Only</option>
+                <option value="science">Science Only</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="count-choice">Number of Questions:</label>
+            <select id="count-choice">
+                <option value="5">5 Questions</option>
+                <option value="10">10 Questions</option>
+                <option value="15">15 Questions</option>
+            </select>
+        </div>
+        <button onclick="startCustomQuiz()">🚀 Start Challenge</button>
+    </div>
+
+    <!-- MAIN QUIZ RUNTIME SCREEN -->
+    <div id="app-screen" class="hidden">
+        <header>
+            <h1>6th Grade Daily Challenge</h1>
+        </header>
+        <div class="stats-bar">
+            <div>👤 <span id="user-display"></span></div>
+            <div>🔥 Streak: <span id="streak-display">0</span> days</div>
+        </div>
+
+        <div id="quiz-container">
+            <div id="dynamic-questions"></div>
+            <button id="finish-btn" class="hidden" onclick="completeDay()">Submit My Answers</button>
+        </div>
+
+        <!-- COMPLETION SCREEN -->
+        <div id="complete-screen" class="completion-screen hidden">
+            <div class="streak-fire">🎉📚✨</div>
+            <h2>Great Job, <span id="congrats-name"></span>!</h2>
+            <p>You completed your custom quiz set!</p>
+            
+            <div class="score-box">
+                <div>Your Performance Level:</div>
+                <div id="score-display-panel" class="score-number">0 / 0 (0%)</div>
+                <div id="badge-display-panel" class="badge-text"></div>
+            </div>
+            
+            <p>What would you like to do next?</p>
+            
+            <div class="decision-box">
+                <button onclick="returnToDashboard()">🔄 Change Subject / Count</button>
+                <button class="btn-secondary" onclick="resetApp()">🚪 Sign Out</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // STATIC TEXT DATABASES (ELA and Science)
+    const elaPool = [
+        { q: "Identify the sentence written in the <strong>active voice</strong>.", options: ["The glass was broken by the ball.", "The dog chased the ball.", "The homework was completed early."], correct: "The dog chased the ball.", explanation: "Active voice puts the doer of the action (The dog) at the very front of the sentence." },
+        { q: "Using context clues, what does <strong>'immense'</strong> mean? 'The climbers stared up at the immense mountain...'", options: ["Extremely large", "Very steep", "Snowy and cold"], correct: "Extremely large", explanation: "The text context clues highlight that the structure is overwhelmingly huge." },
+        { q: "Which word contains a prefix that means 'against'?", options: ["Prespread", "Antivirus", "Submarine"], correct: "Antivirus", explanation: "The prefix 'anti-' means against or counteracting." },
+        { q: "Choose the correct pronoun: 'Sarah and _____ went to the library.'", options: ["me", "myself", "I"], correct: "I", explanation: "Drop 'Sarah and' to test it: You would naturally state 'I went to the library'." },
+        { q: "What is the main purpose of a persuasive essay?", options: ["To tell a story", "To explain a system", "To convince the reader"], correct: "To convince the reader", explanation: "To persuade means to completely win someone over to align with your personal point of view." },
+        { q: "Which word is a synonym for 'furious'?", options: ["Enraged", "Calm", "Tired"], correct: "Enraged", explanation: "Furious means violently or intensely angry. Enraged matches this definition perfectly." },
+        { q: "Identify the conjunction in this sentence: 'I wanted to go swimming, but it started raining.'", options: ["wanted", "but", "started"], correct: "but", explanation: "Conjunctions connect clauses together. 'But' links the two thoughts." },
+        { q: "What punctuation mark is used to show a sudden break or interruption in a sentence?", options: ["A comma", "An em-dash (—)", "A semicolon"], correct: "An em-dash (—)", explanation: "An em-dash creates an abrupt structural break or emphasizes an added thought within a sentence." },
+        { q: "Which of the following words is spelled correctly?", options: ["Recieve", "Receive", "Receve"], correct: "Receive", explanation: "Remember the spelling rule: 'I before E, except after C'." },
+        { q: "What is a stanza in a poem?", options: ["A group of lines forming a verse", "The main rhythm pattern", "The matching sound at the end of words"], correct: "A group of lines forming a verse", explanation: "Stanzas are the paragraphs of poetry, creating structural blocks of lines grouped together." },
+        { q: "Identify the figurative language used here: 'The wind whispered through the trees.'", options: ["Metaphor", "Personification", "Simile"], correct: "Personification", explanation: "Personification gives human traits (whispering) to non-human things (the wind)." },
+        { q: "What type of word describes a noun?", options: ["An adverb", "A verb", "An adjective"], correct: "An adjective", explanation: "Adjectives describe or modify nouns (e.g., the 'blue' sky)." },
+        { q: "Which word is an antonym for 'cautious'?", options: ["Careful", "Reckless", "Quiet"], correct: "Reckless", explanation: "Antonyms are opposites. The opposite of being cautious (careful) is being reckless (careless)." },
+        { q: "What does the root word 'chrono' mean, as used in chronology or stopwatch?", options: ["Time", "Space", "Color"], correct: "Time", explanation: "The Greek root 'chron' or 'chrono' always relates directly to time." },
+        { q: "Identify the main predicate in: 'The happy children played in the park.'", options: ["The happy children", "played in the park", "in the park"], correct: "played in the park", explanation: "The predicate is the part of the sentence containing the verb and stating something about the subject." }
+    ];
+
+    const sciencePool = [
+        { q: "Which layer of the Earth is broken into tectonic plates?", options: ["The Outer Core", "The Lithosphere", "The Inner Core"], correct: "The Lithosphere", explanation: "The lithosphere encompasses the crust and rigid upper mantle broken into moving continental and oceanic plates." },
+        { q: "A rock sitting on the edge of a cliff has what type of energy?", options: ["Kinetic Energy", "Potential Energy", "Thermal Energy"], correct: "Potential Energy", explanation: "Potential energy is stored energy an object possesses based on its physical height positioning." },
+        { q: "What is the primary gas found in Earth's atmosphere?", options: ["Oxygen", "Nitrogen", "Carbon Dioxide"], correct: "Nitrogen", explanation: "Earth's atmosphere consists of roughly 78% Nitrogen gas and 21% Oxygen gas." },
+        { q: "In an ecosystem, what role do mushrooms play?", options: ["Producers", "Decomposers", "Consumers"], correct: "Decomposers", explanation: "Decomposers break down dead biological material to cycle nutrients back into the ecosystem's soil structure." },
+        { q: "What tool is used to measure air pressure in weather forecasting?", options: ["Thermometer", "Anemometer", "Barometer"], correct: "Barometer", explanation: "A barometer measures atmospheric pressure." },
+        { q: "Which state of matter has a definite volume but takes the shape of its container?", options: ["Solid", "Liquid", "Gas"], correct: "Liquid", explanation: "Liquids have fixed volume amounts but flow fluidly to fill the geometric base form of whatever container they occupy." },
+        { q: "What is the process called when liquid water turns into water vapor gas?", options: ["Condensation", "Evaporation", "Precipitation"], correct: "Evaporation", explanation: "Evaporation occurs when heat energy causes liquid surface molecules to escape into the air as water vapor gas." },
+        { q: "Which organ system filters waste liquids out of your bloodstream?", options: ["Digestive System", "Excretory (Urinary) System", "Respiratory System"], correct: "Excretory (Urinary) System", explanation: "The excretory/urinary system uses the kidneys to filter out toxins and liquid waste from your blood supply." },
+        { q: "What force keeps the planets in our solar system orbiting around the Sun?", options: ["Magnetism", "Gravity", "Friction"], correct: "Gravity", explanation: "The Sun's immense mass creates a powerful gravitational pull that prevents the planets from flying off into space." },
+        { q: "In physics, what is the definition of 'velocity'?", options: ["The weight of an object", "Speed in a specific direction", "The energy of an impact"], correct: "Speed in a specific direction", explanation: "Velocity measures tracking rate of speed combined with a explicit vector of heading/direction." },
+        { q: "Which of these is a non-renewable energy source?", options: ["Solar Power", "Coal", "Wind Power"], correct: "Coal", explanation: "Fossil fuels like coal take millions of years to form naturally and cannot be replenished quickly once spent." },
+        { q: "What green pigment inside plant leaves captures sunlight for photosynthesis?", options: ["Chlorophyll", "Cytoplasm", "Cellulose"], correct: "Chlorophyll", explanation: "Chlorophyll absorbing light waves to turn solar energy into chemical sugars gives plants their green coloration." },
+        { q: "What kind of rock forms when molten lava cools and hardens?", options: ["Sedimentary", "Metamorphic", "Igneous"], correct: "Igneous", explanation: "Igneous rocks originate from cooled magma or volcanic lava flows." },
+        { q: "What are the structural building blocks of all living organisms?", options: ["Atoms", "Cells", "Molecules"], correct: "Cells", explanation: "Cells are the smallest baseline operational units considered completely alive." },
+        { q: "What component of an experiment is purposely altered or changed by the scientist?", options: ["Dependent Variable", "Independent Variable", "Control Variable"], correct: "Independent Variable", explanation: "The independent variable is the parameter manipulated to monitor changes across results." }
+    ];
+
+    // MEMORY VAULT TRACKER TO PREVENT REPETITION ACROSS ROUNDS
+    let seenQuestions = [];
+    let userAnswers = {};
+    let currentUser = "";
+    let activeQuizSet = [];
+
+    // ENHANCEMENT: INFRASTRUCTURE GENERATOR FOR INFINITE VARIATIONS
+    function generateDynamicMathQuestion() {
+        const mathTypes = ['algebra', 'scale', 'percentage', 'average'];
+        const chosenType = mathTypes[Math.floor(Math.random() * mathTypes.length)];
+        
+        if (chosenType === 'algebra') {
+            let x = Math.floor(Math.random() * 8) + 2; // Value between 2-9
+            let multiplier = Math.floor(Math.random() * 5) + 2; // Multiplier between 2-6
+            let constant = Math.floor(Math.random() * 9) + 1; // Constant between 1-9
+            let result = (multiplier * x) + constant;
+            
+            return {
+                q: `Solve for x: ${multiplier}x + ${constant} = ${result}`,
+                options: [`x = ${x}`, `x = ${x + 2}`, `x = ${x - 1}`],
+                correct: `x = ${x}`,
+                explanation: `To isolate x, first subtract the constant ${constant} from both sides: ${result} - ${constant} = ${multiplier * x}. This leaves us with ${multiplier}x = ${multiplier * x}. Next, divide both sides by ${multiplier}, which gives us x = ${x}.`
+            };
+        } else if (chosenType === 'scale') {
+            let scale = Math.floor(Math.random() * 6) + 3; // 3-8 miles
+            let inches = Math.floor(Math.random() * 5) + 4; // 4-8 inches
+            let realLife = scale * inches;
+            
+            return {
+                q: `A map scale chart states that 1 inch = ${scale} miles. If two neighborhood blocks are exactly ${inches} inches apart on that paper map, how many miles apart are they in real life?`,
+                options: [`${realLife} miles`, `${realLife - scale} miles`, `${realLife + 4} miles`],
+                correct: `${realLife} miles`,
+                explanation: `This is a scale ratio. Every single inch equals ${scale} miles. To find the total real-world distance, take the map distance (${inches} inches) and multiply it by the scale factor (${scale} miles per inch) to get ${realLife} miles.`
+            };
+        } else if (chosenType === 'percentage') {
+            let base = [40, 60, 80, 120][Math.floor(Math.random() * 4)];
+            let rate = [25, 50, 10].sort(() => 0.5 - Math.random())[0];
+            let answer = (rate / 100) * base;
+            
+            return {
+                q: `What is ${rate}% of ${base}?`,
+                options: [`${answer}`, `${answer + 5}`, `${Math.round(base / 3)}`],
+                correct: `${answer}`,
+                explanation: `${rate}% is mathematically equivalent to the fraction ${rate}/100. To calculate, simply multiply (${rate}/100) by the base number ${base} to arrive at exactly ${answer}.`
+            };
+        } else {
+            let n1 = Math.floor(Math.random() * 5) + 1;
+            let n2 = Math.floor(Math.random() * 5) + 5;
+            let n3 = Math.floor(Math.random() * 6) + 10;
+            let sum = n1 + n2 + n3;
+            let avg = sum / 3;
+            // Ensure integer clean averages
+            if (!Number.isInteger(avg)) return generateDynamicMathQuestion(); 
+
+            return {
+                q: `Find the mathematical mean (average) for this set of operational tracking numbers: ${n1}, ${n2}, and ${n3}.`,
+                options: [`${avg}`, `${avg + 2}`, `${avg - 1}`],
+                correct: `${avg}`,
+                explanation: `To find the mean average of a data set, first add all the individual numbers together: ${n1} + ${n2} + ${n3} = ${sum}. Next, divide that running sum by the total count of numbers in the list (3 items), which results in exactly ${avg}.`
+            };
+        }
+    }
+
+    function signIn() {
+        const nameInput = document.getElementById('username').value.trim();
+        if (!nameInput) return alert("Please enter your name!");
+        currentUser = nameInput;
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('setup-screen').classList.remove('hidden');
+    }
+
+    function startCustomQuiz() {
+        const subject = document.getElementById('subject-choice').value;
+        const totalRequested = parseInt(document.getElementById('count-choice').value);
+        
+        document.getElementById('setup-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.remove('hidden');
+        document.getElementById('user-display').innerText = currentUser;
+        
+        let savedStreak = localStorage.getItem(currentUser + '_streak') || 0;
+        document.getElementById('streak-display').innerText = savedStreak;
+
+        buildCustomEngineData(subject, totalRequested);
+    }
+
+    function buildCustomEngineData(subject, count) {
+        userAnswers = {};
+        const targetDiv = document.getElementById('dynamic-questions');
+        targetDiv.innerHTML = "";
+        document.getElementById('finish-btn').classList.add('hidden');
+
+        activeQuizSet = [];
+
+        // Build Round Dataset with Repetition Filter Locks
+        for (let i = 0; i < count; i++) {
+            let chosenItem = null;
+            let attempts = 0;
+            
+            // Loop until a completely fresh question is found or pool exhausted
+            while (!chosenItem && attempts < 100) {
+                attempts++;
+                let currentSub = subject;
+                if (subject === "mixed") {
+                    const subs = ["math", "ela", "science"];
+                    currentSub = subs[Math.floor(Math.random() * 3)];
+                }
+
+                let potentialItem = null;
+                if (currentSub === "math") {
+                    potentialItem = generateDynamicMathQuestion(); // Always fresh generated
+                } else if (currentSub === "ela") {
+                    potentialItem = elaPool[Math.floor(Math.random() * elaPool.length)];
+                } else if (currentSub === "science") {
+                    potentialItem = sciencePool[Math.floor(Math.random() * sciencePool.length)];
+                }
+
+                // Verify item text doesn't exist inside seen memory vault
+                if (potentialItem && !seenQuestions.includes(potentialItem.q)) {
+                    chosenItem = potentialItem;
+                }
+            }
+
+            // Fallback safety release valve if database pool is completely exhausted
+            if (!chosenItem) {
+                seenQuestions = []; // Reset seen memory vault
+                i--; // Step back and redraw
+                continue;
+            }
+
+            seenQuestions.push(chosenItem.q);
+            activeQuizSet.push(chosenItem);
+        }
+
+        activeQuizSet.forEach((item, index) => {
+            userAnswers[index] = null;
+            
+            let subjectName = "Mathematics";
+            let subjectColor = "#4a90e2";
+            
+            // Checking fields to color code badge titles
+            if (elaPool.some(e => e.q === item.q)) {
+                subjectName = "English Language Arts";
+                subjectColor = "#9b51e0";
+            } else if (sciencePool.some(s => s.q === item.q)) {
+                subjectName = "Science";
+                subjectColor = "#2ec4b6";
+            }
+            
+            let originalOptions = [...item.options];
+            let shuffledIndices = [];
+            while(shuffledIndices.length < originalOptions.length) {
+                let r = Math.floor(Math.random() * originalOptions.length);
+                if(!shuffledIndices.includes(r)) shuffledIndices.push(r);
+            }
+
+            const card = document.createElement('div');
+            card.className = "question-card";
+            card.id = "card-" + index;
+            card.style.borderLeftColor = subjectColor;
+
+            let buttonsHTML = shuffledIndices.map(i => {
+                let optionText = originalOptions[i];
+                return `<button class="option-btn" data-text="${optionText.replace(/"/g, '&quot;')}" onclick="handleOptionClick(this, ${index})">${optionText}</button>`;
+            }).join('');
+
+            card.innerHTML = `
+                <span class="subject-badge" style="background:${subjectColor}">
+                    ${subjectName}
+                </span>
+                <div class="question-text">${item.q}</div>
+                <div class="options-route">
+                    ${buttonsHTML}
+                </div>
+                <div id="explain-${index}" class="explanation-box hidden"></div>
+            `;
+            targetDiv.appendChild(card);
+        });
+    }
+
+    function handleOptionClick(button, questionIndex) {
+        const parent = button.parentElement;
+        const buttons = parent.querySelectorAll('.option-btn');
+        buttons.forEach(btn => btn.disabled = true);
+
+        const itemData = activeQuizSet[questionIndex];
+        const selectedText = button.getAttribute('data-text');
+        const correctText = itemData.correct;
+        const explainBox = document.getElementById("explain-" + questionIndex);
+
+        if (selectedText === correctText) {
+            button.classList.add('correct');
+            userAnswers[questionIndex] = true;
+            explainBox.innerHTML = `<strong style="color: var(--success);">✓ Correct!</strong> ${itemData.explanation}`;
+            explainBox.style.borderLeft = "4px solid var(--success)";
+        } else {
+            button.classList.add('wrong');
+            userAnswers[questionIndex] = false;
+            buttons.forEach(btn => {
+                if (btn.getAttribute('data-text') === correctText) btn.classList.add('correct');
+            });
+            explainBox.innerHTML = `<strong style="color: var(--danger);">💡 Learning Moment:</strong> ${itemData.explanation}`;
+            explainBox.style.borderLeft = "4px solid var(--danger)";
+        }
+        
+        explainBox.classList.remove('hidden');
+
+        const allAnswered = Object.values(userAnswers).every(val => val !== null);
+        if (allAnswered) {
+            document.getElementById('finish-btn').classList.remove('hidden');
+        }
+    }
+
+    function completeDay() {
+        let totalQuestions = activeQuizSet.length;
+        let totalCorrect = Object.values(userAnswers).filter(val => val === true).length;
+        let scorePercentage = Math.round((totalCorrect / totalQuestions) * 100);
+
+        document.getElementById('score-display-panel').innerText = `${totalCorrect} / ${totalQuestions} (${scorePercentage}%)`;
+
+        // ENHANCEMENT: GRADING RUBRIC SYSTEM DETECTOR
+        let badgePanel = document.getElementById('badge-display-panel');
+        if (scorePercentage === 100) {
+            badgePanel.innerHTML = "🏆 Elite Masterpiece! Flawless Academic Run!";
+            badgePanel.style.color = "var(--success)";
+        } else if (scorePercentage >= 80) {
+            badgePanel.innerHTML = "🌟 Excelled Performance! Great Middle School Logic!";
+            badgePanel.style.color = "var(--primary)";
+        } else {
+            badgePanel.innerHTML = "💡 Solid Effort! Review your Learning Moments below to level up!";
+            badgePanel.style.color = "#d69e2e";
+        }
+
+        let currentStreak = parseInt(localStorage.getItem(currentUser + '_streak') || 0);
+        let lastCompletionDate = localStorage.getItem(currentUser + '_last_date');
+        let todayString = new Date().toDateString();
+
+        if (lastCompletionDate !== todayString) {
+            currentStreak += 1;
+            localStorage.setItem(currentUser + '_streak', currentStreak);
+            localStorage.setItem(currentUser + '_last_date', todayString);
+        }
+        
+        document.getElementById('streak-display').innerText = currentStreak;
+        document.getElementById('quiz-container').classList.add('hidden');
+        document.getElementById('complete-screen').classList.remove('hidden');
+        document.getElementById('congrats-name').innerText = currentUser;
+    }
+
+    function returnToDashboard() {
+        document.getElementById('complete-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.add('hidden');
+        document.getElementById('quiz-container').classList.remove('hidden');
+        document.getElementById('setup-screen').classList.remove('hidden');
+    }
+
+    function resetApp() {
+        document.getElementById('username').value = "";
+        document.getElementById('complete-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.add('hidden');
+        document.getElementById('quiz-container').classList.remove('hidden');
+        document.getElementById('auth-screen').classList.remove('hidden');
+        seenQuestions = []; // Reset memory pool on signout
+    }
+</script>
+
+</body>
+</html>
